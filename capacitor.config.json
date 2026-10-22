@@ -1,0 +1,9 @@
+{
+  "appId": "com.lilkayklash.bizconnect",
+  "appName": "Biz Connect",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "android": {
+    "backgroundColor": "#f8fafc"
+  }
+}
