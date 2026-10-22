@@ -1,1 +1,1338 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biz Connect - Multi-Vendor Marketplace</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            --secondary: #0f172a;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --whatsapp: #22c55e;
+            --whatsapp-hover: #16a34a;
+            --star-color: #fbbf24;
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
+        [data-theme="dark"] {
+            --primary: #818cf8;
+            --primary-gradient: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
+            --secondary: #f8fafc;
+            --bg-color: #0b0f19;
+            --card-bg: #1e293b;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --whatsapp: #22c55e;
+            --whatsapp-hover: #16a34a;
+            --star-color: #fbbf24;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4);
+            --shadow-lg: 0 10px 25px -5px rgb(0 0 0 / 0.5);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Modern Header */
+        header {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+
+        .nav-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            white-space: nowrap;
+        }
+
+        .logo i {
+            font-size: 1.1rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            padding: 0.55rem 1rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+        }
+
+        .btn-primary:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 15px rgba(99, 102, 241, 0.35);
+        }
+
+        .btn-outline {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            background: var(--bg-color);
+            border-color: #cbd5e1;
+        }
+
+        .icon-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            width: 38px;
+            height: 38px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .icon-btn:hover {
+            background: var(--bg-color);
+            border-color: var(--primary);
+        }
+
+        .badge-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ef4444;
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        /* Main Container */
+        main {
+            max-width: 1280px;
+            width: 100%;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            flex-grow: 1;
+        }
+
+        .view-section {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hero / Feed Section */
+        .feed-header {
+            margin-bottom: 2.5rem;
+            text-align: center;
+        }
+
+        .feed-header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .feed-header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .product-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .product-img-container {
+            width: 100%;
+            height: 220px;
+            overflow: hidden;
+            background: var(--border);
+            position: relative;
+        }
+
+        .product-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .product-card:hover .product-img {
+            transform: scale(1.05);
+        }
+
+        .product-info {
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            flex-grow: 1;
+        }
+
+        .product-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--secondary);
+        }
+
+        .product-price {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+            font-size: 1.25rem;
+        }
+
+        .product-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .store-tag {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: auto;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .store-link-btn {
+            color: var(--primary);
+            background: none;
+            padding: 0;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .store-link-btn:hover {
+            text-decoration: underline;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .btn-order-direct {
+            flex: 1;
+            background: var(--primary-gradient);
+            color: white;
+            justify-content: center;
+            padding: 0.65rem;
+            font-size: 0.85rem;
+            border-radius: var(--radius-md);
+        }
+
+        .btn-whatsapp-sm {
+            background: var(--whatsapp);
+            color: white;
+            justify-content: center;
+            padding: 0.65rem 0.85rem;
+            font-size: 0.85rem;
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-weight: 600;
+        }
+
+        .btn-whatsapp-sm:hover {
+            background: var(--whatsapp-hover);
+        }
+
+        /* Forms & Containers */
+        .form-container {
+            max-width: 640px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-md);
+        }
+
+        .form-container h2 {
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--secondary);
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--secondary);
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 0.95rem;
+            outline: none;
+            background: var(--card-bg);
+            color: var(--text-main);
+            transition: var(--transition);
+        }
+
+        input:focus, textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+
+        .optional-note {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.35rem;
+        }
+
+        .file-upload-box {
+            border: 2px dashed var(--border);
+            padding: 1.5rem;
+            text-align: center;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            background: var(--bg-color);
+            transition: var(--transition);
+        }
+
+        .file-upload-box:hover {
+            border-color: var(--primary);
+        }
+
+        /* Storefront Profile Page View */
+        .store-profile-header {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .store-profile-info h2 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--secondary);
+            margin-bottom: 0.75rem;
+        }
+
+        .store-details-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        .store-details-grid div {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .store-socials {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .social-badge {
+            background: var(--bg-color);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-md);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--secondary);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid var(--border);
+            transition: var(--transition);
+        }
+
+        .social-badge.whatsapp-badge {
+            background: var(--whatsapp);
+            color: white;
+            border-color: var(--whatsapp);
+        }
+        .social-badge.whatsapp-badge:hover {
+            background: var(--whatsapp-hover);
+        }
+
+        /* Support & Ratings Page Styling */
+        .support-container {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .founder-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .founder-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .founder-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 800;
+        }
+
+        .star-rating-box {
+            display: flex;
+            gap: 0.5rem;
+            font-size: 1.75rem;
+            cursor: pointer;
+            color: var(--border);
+            margin: 0.5rem 0;
+        }
+
+        .star-rating-box i.rated {
+            color: var(--star-color);
+        }
+
+        .review-item {
+            background: var(--bg-color);
+            border: 1px solid var(--border);
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            margin-top: 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        /* Notification Popup System */
+        .notification-toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--card-bg);
+            border-left: 5px solid var(--primary);
+            border: 1px solid var(--border);
+            padding: 1.25rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            max-width: 360px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(120%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .toast-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            color: var(--secondary);
+        }
+
+        .toast-body {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            padding: 1rem;
+        }
+
+        .modal-card {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 500px;
+            padding: 2rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-lg);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            border: 1px dashed var(--border);
+        }
+
+        /* Modern Footer */
+        footer {
+            margin-top: auto;
+            background: var(--card-bg);
+            border-top: 1px solid var(--border);
+            padding: 1.5rem 2rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        footer span {
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .support-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .support-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="nav-container">
+            <div class="logo" onclick="switchView('feed')">
+                <i class="fa-solid fa-store"></i> Biz Connect
+            </div>
+            <div class="nav-buttons">
+                <button class="icon-btn" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+                    <i class="fa-solid fa-moon" id="themeIcon"></i>
+                </button>
+                <button class="icon-btn" onclick="openVendorOrdersModal()" title="Vendor Order Notifications" id="notificationBellBtn" style="display: none;">
+                    <i class="fa-solid fa-bell"></i>
+                    <span class="badge-count" id="orderBadge" style="display: none;">0</span>
+                </button>
+                <button class="btn-outline" onclick="switchView('support')" title="Help & Support">
+                    <i class="fa-solid fa-headset"></i> Support
+                </button>
+                <button class="btn-outline" onclick="switchView('profile-setup')" id="profileNavBtn">
+                    <i class="fa-solid fa-user-gear"></i> Setup Store
+                </button>
+                <button class="btn-primary" onclick="switchView('product-upload')" id="uploadNavBtn" style="display: none;">
+                    <i class="fa-solid fa-plus"></i> Add Product
+                </button>
+                <button class="btn-outline" onclick="viewMyStore()" id="myStoreNavBtn" style="display: none;">
+                    <i class="fa-solid fa-shop"></i> My Store
+                </button>
+                <button class="btn-outline" onclick="logoutVendor()" id="logoutNavBtn" style="display: none; border-color: #ef4444; color: #ef4444;" title="Log Out">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- 1. FEED VIEW -->
+        <section id="feed-view" class="view-section active">
+            <div class="feed-header">
+                <h1>Explore Multi-Vendor Market</h1>
+                <p>Discover unique products directly from independent business owners</p>
+            </div>
+            <div id="products-grid" class="products-grid">
+                <!-- Dynamic Products Injected Here -->
+            </div>
+        </section>
+
+        <!-- 2. PROFILE SETUP / EDIT VIEW -->
+        <section id="profile-setup-view" class="view-section">
+            <div class="form-container">
+                <h2 id="profile-form-title">Create Your Store Profile</h2>
+                <form id="profileForm" onsubmit="saveProfile(event)">
+                    <div class="form-group">
+                        <label>Business Name *</label>
+                        <input type="text" id="bizName" required placeholder="e.g. Klash Ventures">
+                    </div>
+                    <div class="form-group">
+                        <label>WhatsApp Phone Number *</label>
+                        <input type="text" id="bizPhone" required placeholder="e.g. +2348000000000">
+                    </div>
+                    <div class="form-group">
+                        <label>Physical Shop / Company Address *</label>
+                        <textarea id="bizAddress" required rows="2" placeholder="e.g. No 15, Station Road, Osogbo"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>TikTok Handle (Optional)</label>
+                        <input type="text" id="bizTikTok" placeholder="e.g. @klash_world">
+                    </div>
+                    <div class="form-group">
+                        <label>Instagram Handle (Optional)</label>
+                        <input type="text" id="bizInsta" placeholder="e.g. @klash_official">
+                    </div>
+                    <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">Save Profile & Continue</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- 3. PRODUCT UPLOAD VIEW -->
+        <section id="product-upload-view" class="view-section">
+            <div class="form-container">
+                <h2>Upload New Product</h2>
+                <form id="productForm" onsubmit="saveProduct(event)">
+                    <div class="form-group">
+                        <label>Product Name *</label>
+                        <input type="text" id="prodName" required placeholder="e.g. Designer Sneakers">
+                    </div>
+                    <div class="form-group">
+                        <label>Amount / Price (₦) *</label>
+                        <input type="number" id="prodPrice" required placeholder="e.g. 15000">
+                    </div>
+                    <div class="form-group">
+                        <label>Product Photo from Device *</label>
+                        <div class="file-upload-box" onclick="document.getElementById('prodImageFile').click()">
+                            <i class="fa-solid fa-cloud-arrow-up" style="font-size: 2rem; color: var(--primary); margin-bottom: 0.5rem;"></i>
+                            <div id="fileUploadLabel" style="font-weight: 600; font-size: 0.9rem;">Tap to select picture from phone gallery</div>
+                            <div class="optional-note">Supports JPG, PNG, WEBP</div>
+                        </div>
+                        <input type="file" id="prodImageFile" accept="image/*" required style="display: none;" onchange="handleImagePreview(event)">
+                    </div>
+                    <div class="form-group">
+                        <label>Description & Seller's Notes *</label>
+                        <textarea id="prodDesc" required rows="3" placeholder="Provide details like sizes available, quality, color, or delivery notes..."></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">Publish Product</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- 4. INDIVIDUAL STOREFRONT VIEW -->
+        <section id="storefront-view" class="view-section">
+            <div class="store-profile-header" id="storeHeaderContent">
+                <!-- Store Info Injected Here -->
+            </div>
+            <h3 style="margin-bottom: 1.5rem; font-size: 1.3rem; font-weight: 700; color: var(--secondary);">Available Products from this Store</h3>
+            <div id="store-products-grid" class="products-grid">
+                <!-- Store Products Injected Here -->
+            </div>
+        </section>
+
+        <!-- 5. SUPPORT & RATINGS VIEW -->
+        <section id="support-view" class="view-section">
+            <div class="support-container">
+                <div class="feed-header" style="margin-bottom: 1.5rem;">
+                    <h1>Help & Support Hub</h1>
+                    <p>Need assistance or have questions? Reach out directly to the founders or rate our app below!</p>
+                </div>
+
+                <!-- Founder 1: KLASH -->
+                <div class="founder-card">
+                    <div class="founder-header">
+                        <div class="founder-avatar">K</div>
+                        <div>
+                            <h3 style="font-size: 1.2rem; color: var(--secondary);">Ikhlas (KLASH)</h3>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">Co-Founder & Developer Support</p>
+                        </div>
+                    </div>
+                    <div style="font-size: 0.95rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.4rem;">
+                        <div><i class="fa-solid fa-envelope" style="color: var(--primary);"></i> rufaiikhlas2@gmail.com</div>
+                        <div><i class="fa-solid fa-phone" style="color: var(--primary);"></i> 08062112118</div>
+                    </div>
+                    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.5rem;">
+                        <a href="https://wa.me/2348062112118?text=Hi%20Klash,%20I%20need%20help%20with%20Biz%20Connect..." target="_blank" class="btn-whatsapp-sm">
+                            <i class="fa-brands fa-whatsapp"></i> Chat Klash on WhatsApp
+                        </a>
+                        <a href="mailto:rufaiikhlas2@gmail.com" class="btn-outline" style="padding: 0.5rem 0.8rem; font-size: 0.85rem;">
+                            <i class="fa-solid fa-paper-plane"></i> Send Email
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Founder 2: Lilkay -->
+                <div class="founder-card">
+                    <div class="founder-header">
+                        <div class="founder-avatar" style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);">L</div>
+                        <div>
+                            <h3 style="font-size: 1.2rem; color: var(--secondary);">Lilkay</h3>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">Co-Founder & Platform Support</p>
+                        </div>
+                    </div>
+                    <div style="font-size: 0.95rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.4rem;">
+                        <div><i class="fa-solid fa-envelope" style="color: var(--primary);"></i> lilkay776@gmail.com</div>
+                        <div><i class="fa-solid fa-phone" style="color: var(--primary);"></i> 09049424613</div>
+                    </div>
+                    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.5rem;">
+                        <a href="https://wa.me/2349049424613?text=Hi%20Lilkay,%20I%20need%20help%20with%20Biz%20Connect..." target="_blank" class="btn-whatsapp-sm">
+                            <i class="fa-brands fa-whatsapp"></i> Chat Lilkay on WhatsApp
+                        </a>
+                        <a href="mailto:lilkay776@gmail.com" class="btn-outline" style="padding: 0.5rem 0.8rem; font-size: 0.85rem;">
+                            <i class="fa-solid fa-paper-plane"></i> Send Email
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Rate The App Section -->
+                <div class="founder-card">
+                    <h3 style="font-size: 1.2rem; color: var(--secondary);"><i class="fa-solid fa-star" style="color: var(--star-color);"></i> Rate Biz Connect</h3>
+                    <p style="font-size: 0.9rem; color: var(--text-muted);">How would you rate your experience with Biz Connect? Tap the stars below:</p>
+                    
+                    <div class="star-rating-box" id="starContainer">
+                        <i class="fa-solid fa-star" onclick="setRating(1)" onmouseover="hoverRating(1)" onmouseout="resetHover()"></i>
+                        <i class="fa-solid fa-star" onclick="setRating(2)" onmouseover="hoverRating(2)" onmouseout="resetHover()"></i>
+                        <i class="fa-solid fa-star" onclick="setRating(3)" onmouseover="hoverRating(3)" onmouseout="resetHover()"></i>
+                        <i class="fa-solid fa-star" onclick="setRating(4)" onmouseover="hoverRating(4)" onmouseout="resetHover()"></i>
+                        <i class="fa-solid fa-star" onclick="setRating(5)" onmouseover="hoverRating(5)" onmouseout="resetHover()"></i>
+                    </div>
+                    <div id="ratingText" style="font-weight: 700; font-size: 0.9rem; color: var(--primary);">Select stars to rate</div>
+
+                    <form onsubmit="submitReview(event)" style="margin-top: 0.5rem;">
+                        <div class="form-group">
+                            <label>Your Name *</label>
+                            <input type="text" id="reviewerName" required placeholder="e.g. Samuel Ade">
+                        </div>
+                        <div class="form-group">
+                            <label>Your Comment / Feedback *</label>
+                            <textarea id="reviewComment" required rows="3" placeholder="Tell us what you love or what we can improve..."></textarea>
+                        </div>
+                        <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">Submit Review</button>
+                    </form>
+
+                    <div id="reviewsList" style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem;">
+                        <!-- Submitted Reviews Injected Here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- BUYER DIRECT ORDER MODAL -->
+    <div id="orderModal" class="modal-overlay">
+        <div class="modal-card">
+            <h2 style="margin-bottom: 1rem; font-size: 1.4rem;">Place Direct Order</h2>
+            <p id="orderModalProductTitle" style="color: var(--text-muted); margin-bottom: 1.25rem; font-size: 0.95rem;"></p>
+            <form onsubmit="submitDirectOrder(event)">
+                <div class="form-group">
+                    <label>Your Full Name *</label>
+                    <input type="text" id="buyerName" required placeholder="e.g. Adebayo Tunde">
+                </div>
+                <div class="form-group">
+                    <label>Phone Number (for contact/delivery) *</label>
+                    <input type="text" id="buyerPhone" required placeholder="e.g. 08012345678">
+                </div>
+                <div class="form-group">
+                    <label>Home Delivery Address *</label>
+                    <textarea id="buyerAddress" required rows="3" placeholder="Enter full street address or delivery instructions..."></textarea>
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <button type="button" class="btn-outline" style="flex: 1; justify-content: center;" onclick="closeOrderModal()">Cancel</button>
+                    <button type="submit" class="btn-primary" style="flex: 1; justify-content: center;">Confirm Order</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- VENDOR ORDERS NOTIFICATIONS MODAL -->
+    <div id="vendorOrdersModal" class="modal-overlay">
+        <div class="modal-card" style="max-width: 600px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                <h2 style="font-size: 1.4rem; margin: 0;">Store Orders Received</h2>
+                <button class="btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" onclick="closeVendorOrdersModal()">Close</button>
+            </div>
+            <div id="vendorOrdersList" style="max-height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem;">
+                <!-- Populated Orders -->
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Biz Connect &bull; Built by <span>Lilkay & Klash</span></p>
+        <span class="support-link" onclick="switchView('support')"><i class="fa-solid fa-headset"></i> Contact Support & Rate Us</span>
+    </footer>
+
+    <script>
+        // Local Data Storage State
+        let currentVendor = JSON.parse(localStorage.getItem('biz_current_vendor')) || null;
+        let allProducts = JSON.parse(localStorage.getItem('biz_products')) || [];
+        let allOrders = JSON.parse(localStorage.getItem('biz_orders')) || [];
+        let allReviews = JSON.parse(localStorage.getItem('biz_reviews')) || [];
+        let selectedProductForOrder = null;
+        let base64ImageTemp = "";
+        let currentSelectedRating = 5;
+
+        // Initialize Theme & App State on Load
+        window.onload = function() {
+            const savedTheme = localStorage.getItem('biz_theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+            updateNavUI();
+            renderFeed();
+            renderReviews();
+            setRating(5);
+            checkVendorNotifications();
+        };
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('biz_theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const icon = document.getElementById('themeIcon');
+            icon.className = theme === 'light' ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
+        }
+
+        function switchView(viewId) {
+            document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+            document.getElementById(viewId + '-view').classList.add('active');
+            window.scrollTo(0, 0);
+            if(viewId === 'feed') renderFeed();
+            if(viewId === 'support') renderReviews();
+        }
+
+        function updateNavUI() {
+            const profileNavBtn = document.getElementById('profileNavBtn');
+            const uploadNavBtn = document.getElementById('uploadNavBtn');
+            const myStoreNavBtn = document.getElementById('myStoreNavBtn');
+            const logoutNavBtn = document.getElementById('logoutNavBtn');
+            const notificationBellBtn = document.getElementById('notificationBellBtn');
+
+            if (currentVendor) {
+                profileNavBtn.innerHTML = '<i class="fa-solid fa-user-pen"></i> Edit Profile';
+                uploadNavBtn.style.display = "inline-flex";
+                myStoreNavBtn.style.display = "inline-flex";
+                logoutNavBtn.style.display = "inline-flex";
+                notificationBellBtn.style.display = "inline-flex";
+                checkVendorNotifications();
+            } else {
+                profileNavBtn.innerHTML = '<i class="fa-solid fa-user-gear"></i> Setup Store';
+                uploadNavBtn.style.display = "none";
+                myStoreNavBtn.style.display = "none";
+                logoutNavBtn.style.display = "none";
+                notificationBellBtn.style.display = "none";
+            }
+        }
+
+        function logoutVendor() {
+            if (confirm('Are you sure you want to log out of your store account?')) {
+                currentVendor = null;
+                localStorage.removeItem('biz_current_vendor');
+                updateNavUI();
+                switchView('feed');
+                alert('Successfully logged out.');
+            }
+        }
+
+        // Rating Logic
+        function setRating(rating) {
+            currentSelectedRating = rating;
+            highlightStars(rating);
+            const texts = ["", "1 Star - Poor", "2 Stars - Fair", "3 Stars - Good", "4 Stars - Very Good", "5 Stars - Excellent! 🌟"];
+            document.getElementById('ratingText').innerText = texts[rating];
+        }
+
+        function hoverRating(rating) {
+            highlightStars(rating);
+        }
+
+        function resetHover() {
+            highlightStars(currentSelectedRating);
+        }
+
+        function highlightStars(count) {
+            const stars = document.getElementById('starContainer').children;
+            for (let i = 0; i < stars.length; i++) {
+                if (i < count) {
+                    stars[i].classList.add('rated');
+                } else {
+                    stars[i].classList.remove('rated');
+                }
+            }
+        }
+
+        function submitReview(event) {
+            event.preventDefault();
+            const newReview = {
+                id: Date.now(),
+                name: document.getElementById('reviewerName').value,
+                rating: currentSelectedRating,
+                comment: document.getElementById('reviewComment').value,
+                timestamp: new Date().toLocaleDateString()
+            };
+
+            allReviews.unshift(newReview);
+            localStorage.setItem('biz_reviews', JSON.stringify(allReviews));
+            document.getElementById('reviewerName').value = '';
+            document.getElementById('reviewComment').value = '';
+            renderReviews();
+            alert('Thank you for rating and reviewing Biz Connect!');
+        }
+
+        function renderReviews() {
+            const list = document.getElementById('reviewsList');
+            if (allReviews.length === 0) {
+                list.innerHTML = `<p style="font-size: 0.85rem; color: var(--text-muted); text-align: center;">No reviews yet. Be the first to rate us!</p>`;
+                return;
+            }
+
+            list.innerHTML = allReviews.map(r => `
+                <div class="review-item">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;">
+                        <strong>${r.name}</strong>
+                        <span style="color: var(--star-color);">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span>
+                    </div>
+                    <p style="color: var(--text-muted);">${r.comment}</p>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.3rem; text-align: right;">${r.timestamp}</div>
+                </div>
+            `).join('');
+        }
+
+        // Handle Image Upload File-to-Base64 Conversion
+        function handleImagePreview(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    base64ImageTemp = e.target.result;
+                    document.getElementById('fileUploadLabel').innerText = "✓ Image selected: " + file.name;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Save or Edit Profile
+        function saveProfile(event) {
+            event.preventDefault();
+            currentVendor = {
+                name: document.getElementById('bizName').value,
+                phone: document.getElementById('bizPhone').value,
+                address: document.getElementById('bizAddress').value,
+                tiktok: document.getElementById('bizTikTok').value,
+                insta: document.getElementById('bizInsta').value
+            };
+
+            localStorage.setItem('biz_current_vendor', JSON.stringify(currentVendor));
+            updateNavUI();
+            alert('Store profile saved successfully!');
+            switchView('product-upload');
+        }
+
+        document.getElementById('profileNavBtn').addEventListener('click', () => {
+            if (currentVendor) {
+                document.getElementById('bizName').value = currentVendor.name;
+                document.getElementById('bizPhone').value = currentVendor.phone;
+                document.getElementById('bizAddress').value = currentVendor.address;
+                document.getElementById('bizTikTok').value = currentVendor.tiktok || '';
+                document.getElementById('bizInsta').value = currentVendor.insta || '';
+                document.getElementById('profile-form-title').innerText = "Edit Your Store Profile";
+            } else {
+                document.getElementById('profile-form-title').innerText = "Create Your Store Profile";
+                document.getElementById('profileForm').reset();
+            }
+        });
+
+        // Save Product
+        function saveProduct(event) {
+            event.preventDefault();
+            if (!currentVendor) {
+                alert('Please setup your profile first!');
+                switchView('profile-setup');
+                return;
+            }
+
+            if (!base64ImageTemp) {
+                alert('Please upload a product image.');
+                return;
+            }
+
+            const newProduct = {
+                id: Date.now(),
+                vendorName: currentVendor.name,
+                vendorPhone: currentVendor.phone,
+                vendorAddress: currentVendor.address,
+                vendorTikTok: currentVendor.tiktok,
+                vendorInsta: currentVendor.insta,
+                name: document.getElementById('prodName').value,
+                price: document.getElementById('prodPrice').value,
+                image: base64ImageTemp,
+                desc: document.getElementById('prodDesc').value
+            };
+
+            allProducts.unshift(newProduct);
+            localStorage.setItem('biz_products', JSON.stringify(allProducts));
+            
+            document.getElementById('productForm').reset();
+            base64ImageTemp = "";
+            document.getElementById('fileUploadLabel').innerText = "Tap to select picture from phone gallery";
+            alert('Product published successfully!');
+            switchView('feed');
+        }
+
+        // Render Main Feed
+        function renderFeed() {
+            const grid = document.getElementById('products-grid');
+            if (allProducts.length === 0) {
+                grid.innerHTML = `<div class="empty-state" style="grid-column: 1/-1;"><h3>No products available yet</h3><p>Be the first vendor to setup your profile and list items!</p></div>`;
+                return;
+            }
+
+            grid.innerHTML = allProducts.map(p => `
+                <div class="product-card">
+                    <div class="product-img-container">
+                        <img src="${p.image}" alt="${p.name}" class="product-img" onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&auto=format&fit=crop&q=60'">
+                    </div>
+                    <div class="product-info">
+                        <div class="product-title">${p.name}</div>
+                        <div class="product-price">₦${Number(p.price).toLocaleString()}</div>
+                        <div class="product-desc">${p.desc}</div>
+                        <div class="store-tag">
+                            <span><i class="fa-solid fa-location-dot" style="color: var(--primary);"></i> ${p.vendorName}</span>
+                            <button class="store-link-btn" onclick='viewStoreFront(${JSON.stringify(p.vendorName)})'>Visit Store</button>
+                        </div>
+                        <div class="product-actions">
+                            <button class="btn-primary btn-order-direct" onclick='openOrderModal(${JSON.stringify(p.id)})'>
+                                <i class="fa-solid fa-cart-shopping"></i> Order Here
+                            </button>
+                            <a href="https://wa.me/${p.vendorPhone.replace(/\D/g,'')}?text=Hi%20${encodeURIComponent(p.vendorName)},%20I%20am%20interested%20in%20your%20product:%20${encodeURIComponent(p.name)}" target="_blank" class="btn-whatsapp-sm" title="Chat or Call manually">
+                                <i class="fa-brands fa-whatsapp"></i> Chat
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Direct Order Flow
+        function openOrderModal(productId) {
+            selectedProductForOrder = allProducts.find(p => p.id === productId);
+            if (!selectedProductForOrder) return;
+            document.getElementById('orderModalProductTitle').innerText = `Ordering: ${selectedProductForOrder.name} (₦${Number(selectedProductForOrder.price).toLocaleString()}) from ${selectedProductForOrder.vendorName}`;
+            document.getElementById('orderModal').style.display = 'flex';
+        }
+
+        function closeOrderModal() {
+            document.getElementById('orderModal').style.display = 'none';
+            selectedProductForOrder = null;
+            document.getElementById('buyerName').value = '';
+            document.getElementById('buyerPhone').value = '';
+            document.getElementById('buyerAddress').value = '';
+        }
+
+        function submitDirectOrder(event) {
+            event.preventDefault();
+            if (!selectedProductForOrder) return;
+
+            const newOrder = {
+                id: Date.now(),
+                vendorName: selectedProductForOrder.vendorName,
+                productName: selectedProductForOrder.name,
+                productPrice: selectedProductForOrder.price,
+                buyerName: document.getElementById('buyerName').value,
+                buyerPhone: document.getElementById('buyerPhone').value,
+                buyerAddress: document.getElementById('buyerAddress').value,
+                timestamp: new Date().toLocaleString(),
+                read: false
+            };
+
+            allOrders.unshift(newOrder);
+            localStorage.setItem('biz_orders', JSON.stringify(allOrders));
+            closeOrderModal();
+            alert('Order placed successfully! The vendor has been notified.');
+            checkVendorNotifications();
+        }
+
+        // Check & Display Vendor Notifications
+        function checkVendorNotifications() {
+            if (!currentVendor) return;
+            const vendorOrders = allOrders.filter(o => o.vendorName === currentVendor.name);
+            const unreadCount = vendorOrders.filter(o => !o.read).length;
+
+            const badge = document.getElementById('orderBadge');
+            if (unreadCount > 0) {
+                badge.innerText = unreadCount;
+                badge.style.display = "inline-block";
+                
+                const latestUnread = vendorOrders.find(o => !o.read);
+                if (latestUnread && !document.getElementById('activeToast')) {
+                    showOrderToast(latestUnread);
+                }
+            } else {
+                badge.style.display = "none";
+            }
+        }
+
+        function showOrderToast(order) {
+            const toast = document.createElement('div');
+            toast.id = 'activeToast';
+            toast.className = 'notification-toast';
+            toast.innerHTML = `
+                <div class="toast-header">
+                    <span><i class="fa-solid fa-bell" style="color: var(--primary);"></i> New Order Received!</span>
+                    <button onclick="this.parentElement.parentElement.remove()" style="background:none; border:none; cursor:pointer; color:var(--text-muted);"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="toast-body">
+                    <strong>${order.buyerName}</strong> ordered <strong>${order.productName}</strong> (₦${Number(order.productPrice).toLocaleString()}).<br>
+                    Tap the notification bell to view buyer contact details & delivery address.
+                </div>
+                <button class="btn-primary" style="width:100%; padding:0.4rem; font-size:0.8rem; justify-content:center;" onclick="openVendorOrdersModal(); document.getElementById('activeToast').remove();">View Orders</button>
+            `;
+            document.body.appendChild(toast);
+        }
+
+        function openVendorOrdersModal() {
+            if (!currentVendor) return;
+            const vendorOrders = allOrders.filter(o => o.vendorName === currentVendor.name);
+            
+            allOrders.forEach(o => {
+                if (o.vendorName === currentVendor.name) o.read = true;
+            });
+            localStorage.setItem('biz_orders', JSON.stringify(allOrders));
+            checkVendorNotifications();
+
+            const listContainer = document.getElementById('vendorOrdersList');
+            if (vendorOrders.length === 0) {
+                listContainer.innerHTML = `<div class="empty-state"><h3>No orders yet</h3><p>When buyers place orders, they will appear here instantly.</p></div>`;
+            } else {
+                listContainer.innerHTML = vendorOrders.map(o => `
+                    <div style="background: var(--bg-color); border: 1px solid var(--border); padding: 1rem; border-radius: var(--radius-md);">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-weight: 700; color: var(--secondary);">
+                            <span>📦 ${o.productName} (₦${Number(o.productPrice).toLocaleString()})</span>
+                            <span style="font-size: 0.8rem; color: var(--text-muted);">${o.timestamp}</span>
+                        </div>
+                        <div style="font-size: 0.9rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.25rem;">
+                            <div><strong>Buyer Name:</strong> ${o.buyerName}</div>
+                            <div><strong>Phone Number:</strong> <a href="tel:${o.buyerPhone}" style="color: var(--primary);">${o.buyerPhone}</a></div>
+                            <div><strong>Delivery Address:</strong> ${o.buyerAddress}</div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem; flex-wrap: wrap;">
+                            <a href="https://wa.me/${o.buyerPhone.replace(/\D/g,'')}?text=Hi%20${encodeURIComponent(o.buyerName)},%20regarding%20your%20order%20for%20${encodeURIComponent(o.productName)}..." target="_blank" class="btn-whatsapp-sm">
+                                <i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp
+                            </a>
+                            <a href="tel:${o.buyerPhone}" class="btn-outline" style="padding: 0.5rem 0.8rem; font-size: 0.85rem;">
+                                <i class="fa-solid fa-phone"></i> Call Buyer
+                            </a>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            document.getElementById('vendorOrdersModal').style.display = 'flex';
+        }
+
+        function closeVendorOrdersModal() {
+            document.getElementById('vendorOrdersModal').style.display = 'none';
+        }
+
+        // View Specific Storefront
+        function viewMyStore() {
+            if (currentVendor) viewStoreFront(currentVendor.name);
+        }
+
+        function viewStoreFront(vendorName) {
+            const vendorProducts = allProducts.filter(p => p.vendorName === vendorName);
+            let vInfo = currentVendor && currentVendor.name === vendorName ? currentVendor : vendorProducts[0];
+
+            if (!vInfo) return;
+
+            let vPhone = vInfo.phone || vInfo.vendorPhone;
+            let vAddress = vInfo.address || vInfo.vendorAddress;
+            let vTikTok = vInfo.tiktok !== undefined ? vInfo.tiktok : vInfo.vendorTikTok;
+            let vInsta = vInfo.insta !== undefined ? vInfo.insta : vInfo.vendorInsta;
+
+            let cleanPhone = vPhone ? vPhone.replace(/\D/g,'') : '';
+
+            document.getElementById('storeHeaderContent').innerHTML = `
+                <div class="store-profile-info">
+                    <h2>${vInfo.name}</h2>
+                    <div class="store-details-grid">
+                        <div><i class="fa-solid fa-phone" style="color: var(--primary);"></i> <strong>${vPhone}</strong></div>
+                        <div><i class="fa-solid fa-shop" style="color: var(--primary);"></i> <strong>${vAddress}</strong></div>
+                    </div>
+                    <div class="store-socials">
+                        ${vPhone ? `<a href="https://wa.me/${cleanPhone}" target="_blank" class="social-badge whatsapp-badge"><i class="fa-brands fa-whatsapp" style="font-size: 1.1rem;"></i> WhatsApp Chat</a>` : ''}
+                        ${vTikTok ? `<a href="https://tiktok.com/${vTikTok.startsWith('@') ? vTikTok : '@' + vTikTok}" target="_blank" class="social-badge"><i class="fa-brands fa-tiktok"></i> TikTok: ${vTikTok}</a>` : ''}
+                        ${vInsta ? `<a href="https://instagram.com/${vInsta.startsWith('@') ? vInsta.substring(1) : vInsta}" target="_blank" class="social-badge"><i class="fa-brands fa-instagram" style="color: #e1306c;"></i> Instagram: ${vInsta}</a>` : ''}
+                    </div>
+                </div>
+            `;
+
+            const storeGrid = document.getElementById('store-products-grid');
+            if (vendorProducts.length === 0) {
+                storeGrid.innerHTML = `<div class="empty-state" style="grid-column: 1/-1;"><h3>This store has no products</h3><p>Check back later for new arrivals.</p></div>`;
+            } else {
+                storeGrid.innerHTML = vendorProducts.map(p => `
+                    <div class="product-card">
+                        <div class="product-img-container">
+                            <img src="${p.image}" alt="${p.name}" class="product-img" onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&auto=format&fit=crop&q=60'">
+                        </div>
+                        <div class="product-info">
+                            <div class="product-title">${p.name}</div>
+                            <div class="product-price">₦${Number(p.price).toLocaleString()}</div>
+                            <div class="product-desc">${p.desc}</div>
+                            <div class="product-actions">
+                                <button class="btn-primary btn-order-direct" onclick='openOrderModal(${JSON.stringify(p.id)})'>
+                                    <i class="fa-solid fa-cart-shopping"></i> Order Here
+                                </button>
+                                <a href="https://wa.me/${p.vendorPhone.replace(/\D/g,'')}?text=Hi%20${encodeURIComponent(p.vendorName)},%20I%20am%20interested%20in%20your%20product:%20${encodeURIComponent(p.name)}" target="_blank" class="btn-whatsapp-sm">
+                                    <i class="fa-brands fa-whatsapp"></i> Chat
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            switchView('storefront');
+        }
+    </script>
+</body>
+  </html>
