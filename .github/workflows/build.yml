@@ -25,20 +25,24 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Install Capacitor CLI & Android
+      - name: Install Capacitor CLI & Android Platform
         run: |
-          npm install @capacitor/cli @capacitor/core
+          npm install @capacitor/cli @capacitor/core @capacitor/android
           npx cap add android
 
       - name: Sync Capacitor Web Assets
         run: npx cap sync android
+
+      - name: Grant execute permission for Gradle wrapper
+        working-directory: ./android
+        run: chmod +x gradlew
 
       - name: Build Debug APK
         working-directory: ./android
         run: ./gradlew assembleDebug
 
       - name: Upload APK Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: app-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
