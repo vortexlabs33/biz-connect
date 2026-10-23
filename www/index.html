@@ -723,6 +723,11 @@
                     </div>
                     <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">Save Profile & Continue</button>
                 </form>
+
+                <!-- Delete / Reset Profile Option -->
+                <button class="btn-outline" onclick="deleteStoreProfile()" style="border-color: #ef4444; color: #ef4444; margin-top: 1rem; width: 100%; justify-content: center;">
+                    <i class="fa-solid fa-trash-can"></i> Delete Store Profile & Create New
+                </button>
             </div>
         </section>
 
@@ -900,26 +905,56 @@
         <span class="support-link" onclick="switchView('support')"><i class="fa-solid fa-headset"></i> Contact Support & Rate Us</span>
     </footer>
 
-    <script>
-        // Local Data Storage State
+    <!-- Firebase SDK Integration & App Script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCs-EfqpnvQHwKjy_5eRsUMijmpvJUs_74",
+            authDomain: "biz-connect-267e1.firebaseapp.com",
+            projectId: "biz-connect-267e1",
+            storageBucket: "biz-connect-267e1.firebasestorage.app",
+            messagingSenderId: "629743109541",
+            appId: "1:629743109541:web:a5665e859a28758874544c",
+            measurementId: "G-PCGFYHNJWP"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // State variables
         let currentVendor = JSON.parse(localStorage.getItem('biz_current_vendor')) || null;
-        let allProducts = JSON.parse(localStorage.getItem('biz_products')) || [];
-        let allOrders = JSON.parse(localStorage.getItem('biz_orders')) || [];
-        let allReviews = JSON.parse(localStorage.getItem('biz_reviews')) || [];
+        let allProducts = [];
+        let allOrders = [];
+        let allReviews = [];
         let selectedProductForOrder = null;
         let base64ImageTemp = "";
         let currentSelectedRating = 5;
 
-        // Initialize Theme & App State on Load
+        // Listen live to Firestore Collections
+        onSnapshot(query(collection(db, "products"), orderBy("createdAt", "desc")), (snapshot) => {
+            allProducts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderFeed();
+        });
+
+        onSnapshot(query(collection(db, "orders"), orderBy("createdAt", "desc")), (snapshot) => {
+            allOrders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            checkVendorNotifications();
+        });
+
+        onSnapshot(query(collection(db, "reviews"), orderBy("createdAt", "desc")), (snapshot) => {
+            allReviews = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderReviews();
+        });
+
+        // Initialize App on Load
         window.onload = function() {
             const savedTheme = localStorage.getItem('biz_theme') || 'light';
             document.documentElement.setAttribute('data-theme', savedTheme);
             updateThemeIcon(savedTheme);
             updateNavUI();
-            renderFeed();
-            renderReviews();
             setRating(5);
-            checkVendorNotifications();
         };
 
         function toggleTheme() {
@@ -929,19 +964,22 @@
             localStorage.setItem('biz_theme', newTheme);
             updateThemeIcon(newTheme);
         }
+        window.toggleTheme = toggleTheme;
 
         function updateThemeIcon(theme) {
             const icon = document.getElementById('themeIcon');
-            icon.className = theme === 'light' ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
+            if(icon) icon.className = theme === 'light' ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
         }
 
         function switchView(viewId) {
             document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
-            document.getElementById(viewId + '-view').classList.add('active');
+            const target = document.getElementById(viewId + '-view');
+            if(target) target.classList.add('active');
             window.scrollTo(0, 0);
             if(viewId === 'feed') renderFeed();
             if(viewId === 'support') renderReviews();
         }
+        window.switchView = switchView;
 
         function updateNavUI() {
             const profileNavBtn = document.getElementById('profileNavBtn');
@@ -951,18 +989,18 @@
             const notificationBellBtn = document.getElementById('notificationBellBtn');
 
             if (currentVendor) {
-                profileNavBtn.innerHTML = '<i class="fa-solid fa-user-pen"></i> Edit Profile';
-                uploadNavBtn.style.display = "inline-flex";
-                myStoreNavBtn.style.display = "inline-flex";
-                logoutNavBtn.style.display = "inline-flex";
-                notificationBellBtn.style.display = "inline-flex";
+                if(profileNavBtn) profileNavBtn.innerHTML = '<i class="fa-solid fa-user-pen"></i> Edit Profile';
+                if(uploadNavBtn) uploadNavBtn.style.display = "inline-flex";
+                if(myStoreNavBtn) myStoreNavBtn.style.display = "inline-flex";
+                if(logoutNavBtn) logoutNavBtn.style.display = "inline-flex";
+                if(notificationBellBtn) notificationBellBtn.style.display = "inline-flex";
                 checkVendorNotifications();
             } else {
-                profileNavBtn.innerHTML = '<i class="fa-solid fa-user-gear"></i> Setup Store';
-                uploadNavBtn.style.display = "none";
-                myStoreNavBtn.style.display = "none";
-                logoutNavBtn.style.display = "none";
-                notificationBellBtn.style.display = "none";
+                if(profileNavBtn) profileNavBtn.innerHTML = '<i class="fa-solid fa-user-gear"></i> Setup Store';
+                if(uploadNavBtn) uploadNavBtn.style.display = "none";
+                if(myStoreNavBtn) myStoreNavBtn.style.display = "none";
+                if(logoutNavBtn) logoutNavBtn.style.display = "none";
+                if(notificationBellBtn) notificationBellBtn.style.display = "none";
             }
         }
 
@@ -975,54 +1013,70 @@
                 alert('Successfully logged out.');
             }
         }
+        window.logoutVendor = logoutVendor;
+
+        function deleteStoreProfile() {
+            if (confirm('Are you sure you want to delete your store profile? This will let you create a brand new store.')) {
+                currentVendor = null;
+                localStorage.removeItem('biz_current_vendor');
+                updateNavUI();
+                switchView('profile-setup');
+                document.getElementById('profile-form-title').innerText = "Create Your Store Profile";
+                document.getElementById('profileForm').reset();
+                alert('Store profile cleared! You can now create a new store.');
+            }
+        }
+        window.deleteStoreProfile = deleteStoreProfile;
 
         // Rating Logic
         function setRating(rating) {
             currentSelectedRating = rating;
             highlightStars(rating);
             const texts = ["", "1 Star - Poor", "2 Stars - Fair", "3 Stars - Good", "4 Stars - Very Good", "5 Stars - Excellent! 🌟"];
-            document.getElementById('ratingText').innerText = texts[rating];
+            const rText = document.getElementById('ratingText');
+            if(rText) rText.innerText = texts[rating];
         }
+        window.setRating = setRating;
 
-        function hoverRating(rating) {
-            highlightStars(rating);
-        }
+        function hoverRating(rating) { highlightStars(rating); }
+        window.hoverRating = hoverRating;
 
-        function resetHover() {
-            highlightStars(currentSelectedRating);
-        }
+        function resetHover() { highlightStars(currentSelectedRating); }
+        window.resetHover = resetHover;
 
         function highlightStars(count) {
-            const stars = document.getElementById('starContainer').children;
+            const starCont = document.getElementById('starContainer');
+            if(!starCont) return;
+            const stars = starCont.children;
             for (let i = 0; i < stars.length; i++) {
-                if (i < count) {
-                    stars[i].classList.add('rated');
-                } else {
-                    stars[i].classList.remove('rated');
-                }
+                if (i < count) stars[i].classList.add('rated');
+                else stars[i].classList.remove('rated');
             }
         }
 
-        function submitReview(event) {
+        async function submitReview(event) {
             event.preventDefault();
-            const newReview = {
-                id: Date.now(),
-                name: document.getElementById('reviewerName').value,
-                rating: currentSelectedRating,
-                comment: document.getElementById('reviewComment').value,
-                timestamp: new Date().toLocaleDateString()
-            };
-
-            allReviews.unshift(newReview);
-            localStorage.setItem('biz_reviews', JSON.stringify(allReviews));
-            document.getElementById('reviewerName').value = '';
-            document.getElementById('reviewComment').value = '';
-            renderReviews();
-            alert('Thank you for rating and reviewing Biz Connect!');
+            try {
+                await addDoc(collection(db, "reviews"), {
+                    name: document.getElementById('reviewerName').value,
+                    rating: currentSelectedRating,
+                    comment: document.getElementById('reviewComment').value,
+                    createdAt: Date.now(),
+                    timestamp: new Date().toLocaleDateString()
+                });
+                document.getElementById('reviewerName').value = '';
+                document.getElementById('reviewComment').value = '';
+                alert('Thank you for rating and reviewing Biz Connect!');
+            } catch (err) {
+                console.error("Error adding review: ", err);
+                alert('Error submitting review. Check connection.');
+            }
         }
+        window.submitReview = submitReview;
 
         function renderReviews() {
             const list = document.getElementById('reviewsList');
+            if (!list) return;
             if (allReviews.length === 0) {
                 list.innerHTML = `<p style="font-size: 0.85rem; color: var(--text-muted); text-align: center;">No reviews yet. Be the first to rate us!</p>`;
                 return;
@@ -1035,7 +1089,7 @@
                         <span style="color: var(--star-color);">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span>
                     </div>
                     <p style="color: var(--text-muted);">${r.comment}</p>
-                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.3rem; text-align: right;">${r.timestamp}</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.3rem; text-align: right;">${r.timestamp || ''}</div>
                 </div>
             `).join('');
         }
@@ -1046,11 +1100,13 @@
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     base64ImageTemp = e.target.result;
-                    document.getElementById('fileUploadLabel').innerText = "✓ Image selected: " + file.name;
+                    const lbl = document.getElementById('fileUploadLabel');
+                    if(lbl) lbl.innerText = "✓ Image selected: " + file.name;
                 };
                 reader.readAsDataURL(file);
             }
         }
+        window.handleImagePreview = handleImagePreview;
 
         function saveProfile(event) {
             event.preventDefault();
@@ -1067,22 +1123,26 @@
             alert('Store profile saved successfully!');
             switchView('product-upload');
         }
+        window.saveProfile = saveProfile;
 
-        document.getElementById('profileNavBtn').addEventListener('click', () => {
-            if (currentVendor) {
-                document.getElementById('bizName').value = currentVendor.name;
-                document.getElementById('bizPhone').value = currentVendor.phone;
-                document.getElementById('bizAddress').value = currentVendor.address;
-                document.getElementById('bizTikTok').value = currentVendor.tiktok || '';
-                document.getElementById('bizInsta').value = currentVendor.insta || '';
-                document.getElementById('profile-form-title').innerText = "Edit Your Store Profile";
-            } else {
-                document.getElementById('profile-form-title').innerText = "Create Your Store Profile";
-                document.getElementById('profileForm').reset();
-            }
-        });
+        const profileBtn = document.getElementById('profileNavBtn');
+        if(profileBtn) {
+            profileBtn.addEventListener('click', () => {
+                if (currentVendor) {
+                    document.getElementById('bizName').value = currentVendor.name;
+                    document.getElementById('bizPhone').value = currentVendor.phone;
+                    document.getElementById('bizAddress').value = currentVendor.address;
+                    document.getElementById('bizTikTok').value = currentVendor.tiktok || '';
+                    document.getElementById('bizInsta').value = currentVendor.insta || '';
+                    document.getElementById('profile-form-title').innerText = "Edit Your Store Profile";
+                } else {
+                    document.getElementById('profile-form-title').innerText = "Create Your Store Profile";
+                    document.getElementById('profileForm').reset();
+                }
+            });
+        }
 
-        function saveProduct(event) {
+        async function saveProduct(event) {
             event.preventDefault();
             if (!currentVendor) {
                 alert('Please setup your profile first!');
@@ -1095,34 +1155,38 @@
                 return;
             }
 
-            const newProduct = {
-                id: Date.now(),
-                vendorName: currentVendor.name,
-                vendorPhone: currentVendor.phone,
-                vendorAddress: currentVendor.address,
-                vendorTikTok: currentVendor.tiktok,
-                vendorInsta: currentVendor.insta,
-                name: document.getElementById('prodName').value,
-                price: document.getElementById('prodPrice').value,
-                image: base64ImageTemp,
-                desc: document.getElementById('prodDesc').value
-            };
+            try {
+                await addDoc(collection(db, "products"), {
+                    vendorName: currentVendor.name,
+                    vendorPhone: currentVendor.phone,
+                    vendorAddress: currentVendor.address,
+                    vendorTikTok: currentVendor.tiktok || "",
+                    vendorInsta: currentVendor.insta || "",
+                    name: document.getElementById('prodName').value,
+                    price: document.getElementById('prodPrice').value,
+                    image: base64ImageTemp,
+                    desc: document.getElementById('prodDesc').value,
+                    createdAt: Date.now()
+                });
 
-            allProducts.unshift(newProduct);
-            localStorage.setItem('biz_products', JSON.stringify(allProducts));
-            
-            document.getElementById('productForm').reset();
-            base64ImageTemp = "";
-            document.getElementById('fileUploadLabel').innerText = "Tap to select picture from phone gallery";
-            alert('Product published successfully!');
-            switchView('feed');
+                document.getElementById('productForm').reset();
+                base64ImageTemp = "";
+                const lbl = document.getElementById('fileUploadLabel');
+                if(lbl) lbl.innerText = "Tap to select picture from phone gallery";
+                alert('Product published live to cloud database!');
+                switchView('feed');
+            } catch (err) {
+                console.error("Error publishing product:", err);
+                alert("Failed to publish product. Please check your network.");
+            }
         }
+        window.saveProduct = saveProduct;
 
         // Render Feed with Adsterra Live Script Banner Container + Native Banner Card
         function renderFeed() {
             const grid = document.getElementById('products-grid');
+            if(!grid) return;
             
-            // 1. Live Adsterra Banner Script Container
             let scriptBannerHTML = `
                 <div class="product-card" style="border: 1px solid var(--border); padding: 1rem; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 250px;">
                     <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 700; width: 100%; border-bottom: 1px solid var(--border); padding-bottom: 0.3rem;">Sponsored Partner</div>
@@ -1130,7 +1194,6 @@
                 </div>
             `;
 
-            // 2. High-Converting Direct Link Native Banner Card
             let directLinkBannerHTML = `
                 <div class="product-card" style="border: 2px solid var(--primary); background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(168, 85, 247, 0.05));">
                     <div class="product-img-container" style="background: var(--primary-gradient); display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; padding: 1.5rem; text-align: center;">
@@ -1153,7 +1216,7 @@
             let combinedAds = scriptBannerHTML + directLinkBannerHTML;
 
             if (allProducts.length === 0) {
-                grid.innerHTML = combinedAds + `<div class="empty-state" style="grid-column: span 1;"><h3>No user products yet</h3><p>Be the first vendor to setup your profile and list items!</p></div>`;
+                grid.innerHTML = combinedAds + `<div class="empty-state" style="grid-column: span 1;"><h3>No cloud products yet</h3><p>Be the first vendor to setup your profile and list items!</p></div>`;
                 return;
             }
 
@@ -1191,6 +1254,7 @@
             document.getElementById('orderModalProductTitle').innerText = `Ordering: ${selectedProductForOrder.name} (₦${Number(selectedProductForOrder.price).toLocaleString()}) from ${selectedProductForOrder.vendorName}`;
             document.getElementById('orderModal').style.display = 'flex';
         }
+        window.openOrderModal = openOrderModal;
 
         function closeOrderModal() {
             document.getElementById('orderModal').style.display = 'none';
@@ -1199,29 +1263,33 @@
             document.getElementById('buyerPhone').value = '';
             document.getElementById('buyerAddress').value = '';
         }
+        window.closeOrderModal = closeOrderModal;
 
-        function submitDirectOrder(event) {
+        async function submitDirectOrder(event) {
             event.preventDefault();
             if (!selectedProductForOrder) return;
 
-            const newOrder = {
-                id: Date.now(),
-                vendorName: selectedProductForOrder.vendorName,
-                productName: selectedProductForOrder.name,
-                productPrice: selectedProductForOrder.price,
-                buyerName: document.getElementById('buyerName').value,
-                buyerPhone: document.getElementById('buyerPhone').value,
-                buyerAddress: document.getElementById('buyerAddress').value,
-                timestamp: new Date().toLocaleString(),
-                read: false
-            };
+            try {
+                await addDoc(collection(db, "orders"), {
+                    vendorName: selectedProductForOrder.vendorName,
+                    productName: selectedProductForOrder.name,
+                    productPrice: selectedProductForOrder.price,
+                    buyerName: document.getElementById('buyerName').value,
+                    buyerPhone: document.getElementById('buyerPhone').value,
+                    buyerAddress: document.getElementById('buyerAddress').value,
+                    createdAt: Date.now(),
+                    timestamp: new Date().toLocaleString(),
+                    read: false
+                });
 
-            allOrders.unshift(newOrder);
-            localStorage.setItem('biz_orders', JSON.stringify(allOrders));
-            closeOrderModal();
-            alert('Order placed successfully! The vendor has been notified.');
-            checkVendorNotifications();
+                closeOrderModal();
+                alert('Order placed successfully! The vendor has been notified instantly via cloud.');
+            } catch (err) {
+                console.error("Error submitting order:", err);
+                alert("Failed to submit order. Check your internet.");
+            }
         }
+        window.submitDirectOrder = submitDirectOrder;
 
         function checkVendorNotifications() {
             if (!currentVendor) return;
@@ -1229,48 +1297,23 @@
             const unreadCount = vendorOrders.filter(o => !o.read).length;
 
             const badge = document.getElementById('orderBadge');
+            if(!badge) return;
+
             if (unreadCount > 0) {
                 badge.innerText = unreadCount;
                 badge.style.display = "inline-block";
-                
-                const latestUnread = vendorOrders.find(o => !o.read);
-                if (latestUnread && !document.getElementById('activeToast')) {
-                    showOrderToast(latestUnread);
-                }
             } else {
                 badge.style.display = "none";
             }
-        }
-
-        function showOrderToast(order) {
-            const toast = document.createElement('div');
-            toast.id = 'activeToast';
-            toast.className = 'notification-toast';
-            toast.innerHTML = `
-                <div class="toast-header">
-                    <span><i class="fa-solid fa-bell" style="color: var(--primary);"></i> New Order Received!</span>
-                    <button onclick="this.parentElement.parentElement.remove()" style="background:none; border:none; cursor:pointer; color:var(--text-muted);"><i class="fa-solid fa-xmark"></i></button>
-                </div>
-                <div class="toast-body">
-                    <strong>${order.buyerName}</strong> ordered <strong>${order.productName}</strong> (₦${Number(order.productPrice).toLocaleString()}).<br>
-                    Tap the notification bell to view buyer contact details & delivery address.
-                </div>
-                <button class="btn-primary" style="width:100%; padding:0.4rem; font-size:0.8rem; justify-content:center;" onclick="openVendorOrdersModal(); document.getElementById('activeToast').remove();">View Orders</button>
-            `;
-            document.body.appendChild(toast);
         }
 
         function openVendorOrdersModal() {
             if (!currentVendor) return;
             const vendorOrders = allOrders.filter(o => o.vendorName === currentVendor.name);
             
-            allOrders.forEach(o => {
-                if (o.vendorName === currentVendor.name) o.read = true;
-            });
-            localStorage.setItem('biz_orders', JSON.stringify(allOrders));
-            checkVendorNotifications();
-
             const listContainer = document.getElementById('vendorOrdersList');
+            if(!listContainer) return;
+
             if (vendorOrders.length === 0) {
                 listContainer.innerHTML = `<div class="empty-state"><h3>No orders yet</h3><p>When buyers place orders, they will appear here instantly.</p></div>`;
             } else {
@@ -1299,14 +1342,17 @@
 
             document.getElementById('vendorOrdersModal').style.display = 'flex';
         }
+        window.openVendorOrdersModal = openVendorOrdersModal;
 
         function closeVendorOrdersModal() {
             document.getElementById('vendorOrdersModal').style.display = 'none';
         }
+        window.closeVendorOrdersModal = closeVendorOrdersModal;
 
         function viewMyStore() {
             if (currentVendor) viewStoreFront(currentVendor.name);
         }
+        window.viewMyStore = viewMyStore;
 
         function viewStoreFront(vendorName) {
             const vendorProducts = allProducts.filter(p => p.vendorName === vendorName);
@@ -1364,6 +1410,7 @@
 
             switchView('storefront');
         }
+        window.viewStoreFront = viewStoreFront;
     </script>
 </body>
 </html>
