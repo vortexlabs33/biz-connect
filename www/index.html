@@ -243,6 +243,7 @@
             transition: var(--transition);
             display: flex;
             flex-direction: column;
+            position: relative;
         }
 
         .product-card:hover {
@@ -354,6 +355,55 @@
 
         .btn-whatsapp-sm:hover {
             background: var(--whatsapp-hover);
+        }
+
+        /* Stock Badge & Controls */
+        .out-of-stock-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: #ef4444;
+            color: white;
+            padding: 0.3rem 0.7rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            z-index: 2;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+        }
+
+        .vendor-control-bar {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px dashed var(--border);
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .btn-toggle-stock {
+            flex: 1;
+            padding: 0.5rem;
+            font-size: 0.8rem;
+            justify-content: center;
+            border-radius: var(--radius-md);
+        }
+
+        .btn-delete-prod {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8rem;
+            border-radius: var(--radius-md);
+        }
+
+        .btn-delete-prod:hover {
+            background: #ef4444;
+            color: white;
         }
 
         /* Forms & Containers */
@@ -545,42 +595,6 @@
             border-radius: var(--radius-md);
             margin-top: 0.75rem;
             font-size: 0.9rem;
-        }
-
-        /* Notification Popup System */
-        .notification-toast {
-            position: fixed;
-            bottom: 74px; /* Adjusted to stay above bottom task bar */
-            right: 24px;
-            background: var(--card-bg);
-            border-left: 5px solid var(--primary);
-            border: 1px solid var(--border);
-            padding: 1.25rem;
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-lg);
-            z-index: 1000;
-            max-width: 360px;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(120%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        .toast-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.5rem;
-            font-weight: 700;
-            color: var(--secondary);
-        }
-
-        .toast-body {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            margin-bottom: 0.75rem;
         }
 
         /* Modal Overlay */
@@ -966,7 +980,7 @@
     <!-- Firebase SDK Integration & App Script -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCs-EfqpnvQHwKjy_5eRsUMijmpvJUs_74",
@@ -994,6 +1008,13 @@
         onSnapshot(query(collection(db, "products"), orderBy("createdAt", "desc")), (snapshot) => {
             allProducts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             renderFeed();
+            
+            // Re-render storefront view if actively looking at a store
+            const activeView = document.querySelector('.view-section.active');
+            if (activeView && activeView.id === 'storefront-view') {
+                const headerTitle = document.querySelector('#storeHeaderContent h2');
+                if (headerTitle) viewStoreFront(headerTitle.innerText);
+            }
         });
 
         onSnapshot(query(collection(db, "orders"), orderBy("createdAt", "desc")), (snapshot) => {
@@ -1101,6 +1122,33 @@
             }
         }
         window.deleteStoreProfile = deleteStoreProfile;
+
+        // Inventory Controls: Toggle Stock Status & Delete Product
+        async function toggleStock(productId, currentStatus) {
+            try {
+                const prodRef = doc(db, "products", productId);
+                await updateDoc(prodRef, {
+                    inStock: !currentStatus
+                });
+            } catch (err) {
+                console.error("Error updating stock:", err);
+                alert("Failed to update stock status. Check your connection.");
+            }
+        }
+        window.toggleStock = toggleStock;
+
+        async function deleteProduct(productId) {
+            if (confirm("Are you sure you want to permanently delete this product?")) {
+                try {
+                    await deleteDoc(doc(db, "products", productId));
+                    alert("Product deleted successfully.");
+                } catch (err) {
+                    console.error("Error deleting product:", err);
+                    alert("Failed to delete product. Check your connection.");
+                }
+            }
+        }
+        window.deleteProduct = deleteProduct;
 
         // Rating Logic
         function setRating(rating) {
@@ -1240,6 +1288,7 @@
                     price: document.getElementById('prodPrice').value,
                     image: base64ImageTemp,
                     desc: document.getElementById('prodDesc').value,
+                    inStock: true,
                     createdAt: Date.now()
                 });
 
@@ -1294,8 +1343,13 @@
                 return;
             }
 
-            let productsHTML = allProducts.map(p => `
-                <div class="product-card">
+            let productsHTML = allProducts.map(p => {
+                const isOwner = currentVendor && currentVendor.name === p.vendorName;
+                const inStock = p.inStock !== false;
+
+                return `
+                <div class="product-card" style="${!inStock ? 'opacity: 0.75;' : ''}">
+                    ${!inStock ? `<div class="out-of-stock-badge">Out of Stock</div>` : ''}
                     <div class="product-img-container">
                         <img src="${p.image}" alt="${p.name}" class="product-img" onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&auto=format&fit=crop&q=60'">
                     </div>
@@ -1308,16 +1362,34 @@
                             <button class="store-link-btn" onclick='viewStoreFront(${JSON.stringify(p.vendorName)})'>Visit Store</button>
                         </div>
                         <div class="product-actions">
-                            <button class="btn-primary btn-order-direct" onclick='openOrderModal(${JSON.stringify(p.id)})'>
-                                <i class="fa-solid fa-cart-shopping"></i> Order Here
-                            </button>
-                            <a href="https://wa.me/${p.vendorPhone.replace(/\D/g,'')}?text=Hi%20${encodeURIComponent(p.vendorName)},%20I%20am%20interested%20in%20your%20product:%20${encodeURIComponent(p.name)}" target="_blank" class="btn-whatsapp-sm">
-                                <i class="fa-brands fa-whatsapp"></i> Chat
-                            </a>
+                            ${inStock ? `
+                                <button class="btn-primary btn-order-direct" onclick='openOrderModal(${JSON.stringify(p.id)})'>
+                                    <i class="fa-solid fa-cart-shopping"></i> Order Here
+                                </button>
+                                <a href="https://wa.me/${p.vendorPhone.replace(/\D/g,'')}?text=Hi%20${encodeURIComponent(p.vendorName)},%20I%20am%20interested%20in%20your%20product:%20${encodeURIComponent(p.name)}" target="_blank" class="btn-whatsapp-sm">
+                                    <i class="fa-brands fa-whatsapp"></i> Chat
+                                </a>
+                            ` : `
+                                <button class="btn-outline" style="flex: 1; justify-content: center; cursor: not-allowed; opacity: 0.6;" disabled>
+                                    <i class="fa-solid fa-ban"></i> Out of Stock
+                                </button>
+                            `}
                         </div>
+
+                        ${isOwner ? `
+                            <div class="vendor-control-bar">
+                                <button class="btn-outline btn-toggle-stock" onclick='toggleStock("${p.id}", ${inStock})'>
+                                    <i class="fa-solid ${inStock ? 'fa-eye-slash' : 'fa-eye'}"></i>
+                                    ${inStock ? 'Mark Out of Stock' : 'Mark In Stock'}
+                                </button>
+                                <button class="btn-delete-prod" onclick='deleteProduct("${p.id}")' title="Delete Product">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+                        ` : ''}
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
 
             grid.innerHTML = combinedAds + productsHTML;
         }
@@ -1460,8 +1532,13 @@
             if (vendorProducts.length === 0) {
                 storeGrid.innerHTML = `<div class="empty-state" style="grid-column: 1/-1;"><h3>This store has no products</h3><p>Check back later for new arrivals.</p></div>`;
             } else {
-                storeGrid.innerHTML = vendorProducts.map(p => `
-                    <div class="product-card">
+                storeGrid.innerHTML = vendorProducts.map(p => {
+                    const isOwner = currentVendor && currentVendor.name === p.vendorName;
+                    const inStock = p.inStock !== false;
+
+                    return `
+                    <div class="product-card" style="${!inStock ? 'opacity: 0.75;' : ''}">
+                        ${!inStock ? `<div class="out-of-stock-badge">Out of Stock</div>` : ''}
                         <div class="product-img-container">
                             <img src="${p.image}" alt="${p.name}" class="product-img" onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&auto=format&fit=crop&q=60'">
                         </div>
@@ -1470,16 +1547,34 @@
                             <div class="product-price">₦${Number(p.price).toLocaleString()}</div>
                             <div class="product-desc">${p.desc}</div>
                             <div class="product-actions">
-                                <button class="btn-primary btn-order-direct" onclick='openOrderModal(${JSON.stringify(p.id)})'>
-                                    <i class="fa-solid fa-cart-shopping"></i> Order Here
-                                </button>
-                                <a href="https://wa.me/${p.vendorPhone.replace(/\D/g,'')}?text=Hi%20${encodeURIComponent(p.vendorName)},%20I%20am%20interested%20in%20your%20product:%20${encodeURIComponent(p.name)}" target="_blank" class="btn-whatsapp-sm">
-                                    <i class="fa-brands fa-whatsapp"></i> Chat
-                                </a>
+                                ${inStock ? `
+                                    <button class="btn-primary btn-order-direct" onclick='openOrderModal(${JSON.stringify(p.id)})'>
+                                        <i class="fa-solid fa-cart-shopping"></i> Order Here
+                                    </button>
+                                    <a href="https://wa.me/${p.vendorPhone.replace(/\D/g,'')}?text=Hi%20${encodeURIComponent(p.vendorName)},%20I%20am%20interested%20in%20your%20product:%20${encodeURIComponent(p.name)}" target="_blank" class="btn-whatsapp-sm">
+                                        <i class="fa-brands fa-whatsapp"></i> Chat
+                                    </a>
+                                ` : `
+                                    <button class="btn-outline" style="flex: 1; justify-content: center; cursor: not-allowed; opacity: 0.6;" disabled>
+                                        <i class="fa-solid fa-ban"></i> Out of Stock
+                                    </button>
+                                `}
                             </div>
+
+                            ${isOwner ? `
+                                <div class="vendor-control-bar">
+                                    <button class="btn-outline btn-toggle-stock" onclick='toggleStock("${p.id}", ${inStock})'>
+                                        <i class="fa-solid ${inStock ? 'fa-eye-slash' : 'fa-eye'}"></i>
+                                        ${inStock ? 'Mark Out of Stock' : 'Mark In Stock'}
+                                    </button>
+                                    <button class="btn-delete-prod" onclick='deleteProduct("${p.id}")' title="Delete Product">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </div>
+                            ` : ''}
                         </div>
                     </div>
-                `).join('');
+                `}).join('');
             }
 
             switchView('storefront');
