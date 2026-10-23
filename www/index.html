@@ -62,6 +62,7 @@
             display: flex;
             flex-direction: column;
             transition: background-color 0.3s ease, color 0.3s ease;
+            padding-bottom: 70px; /* Space for bottom task bar */
         }
 
         button, a, .store-link-btn, input, textarea, select, .file-upload-box {
@@ -549,7 +550,7 @@
         /* Notification Popup System */
         .notification-toast {
             position: fixed;
-            bottom: 24px;
+            bottom: 74px; /* Adjusted to stay above bottom task bar */
             right: 24px;
             background: var(--card-bg);
             border-left: 5px solid var(--primary);
@@ -617,6 +618,47 @@
             background: var(--card-bg);
             border-radius: var(--radius-lg);
             border: 1px dashed var(--border);
+        }
+
+        /* Bottom Task Bar Navigation */
+        .bottom-task-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--card-bg);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0.6rem 1rem;
+            z-index: 999;
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(12px);
+        }
+
+        .task-bar-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 4px 12px;
+            border-radius: var(--radius-md);
+        }
+
+        .task-bar-btn i {
+            font-size: 1.2rem;
+        }
+
+        .task-bar-btn:hover, .task-bar-btn.active {
+            color: var(--primary);
         }
 
         /* Modern Footer */
@@ -861,6 +903,22 @@
         </section>
     </main>
 
+    <!-- BOTTOM TASK BAR NAVIGATION -->
+    <div class="bottom-task-bar">
+        <button class="task-bar-btn active" id="taskHomeBtn" onclick="switchView('feed')">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </button>
+        <button class="task-bar-btn" id="taskStoreBtn" onclick="if(currentVendor) { viewMyStore(); } else { switchView('profile-setup'); }">
+            <i class="fa-solid fa-store"></i>
+            <span>My Store</span>
+        </button>
+        <button class="task-bar-btn" id="taskSupportBtn" onclick="switchView('support')">
+            <i class="fa-solid fa-headset"></i>
+            <span>Support</span>
+        </button>
+    </div>
+
     <!-- BUYER DIRECT ORDER MODAL -->
     <div id="orderModal" class="modal-overlay">
         <div class="modal-card">
@@ -955,6 +1013,7 @@
             updateThemeIcon(savedTheme);
             updateNavUI();
             setRating(5);
+            initHardwareBackButton();
         };
 
         function toggleTheme() {
@@ -978,8 +1037,23 @@
             window.scrollTo(0, 0);
             if(viewId === 'feed') renderFeed();
             if(viewId === 'support') renderReviews();
+            updateTaskBarActiveState(viewId);
         }
         window.switchView = switchView;
+
+        function updateTaskBarActiveState(viewId) {
+            document.querySelectorAll('.task-bar-btn').forEach(btn => btn.classList.remove('active'));
+            if (viewId === 'feed') {
+                const homeBtn = document.getElementById('taskHomeBtn');
+                if(homeBtn) homeBtn.classList.add('active');
+            } else if (viewId === 'storefront' || viewId === 'profile-setup') {
+                const storeBtn = document.getElementById('taskStoreBtn');
+                if(storeBtn) storeBtn.classList.add('active');
+            } else if (viewId === 'support') {
+                const supportBtn = document.getElementById('taskSupportBtn');
+                if(supportBtn) supportBtn.classList.add('active');
+            }
+        }
 
         function updateNavUI() {
             const profileNavBtn = document.getElementById('profileNavBtn');
@@ -1411,6 +1485,20 @@
             switchView('storefront');
         }
         window.viewStoreFront = viewStoreFront;
+
+        // Capacitor Hardware Back Button Handler
+        function initHardwareBackButton() {
+            if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+                window.Capacitor.Plugins.App.addListener('backButton', () => {
+                    const activeView = document.querySelector('.view-section.active');
+                    if (activeView && activeView.id === 'feed-view') {
+                        window.Capacitor.Plugins.App.exitApp();
+                    } else {
+                        switchView('feed');
+                    }
+                });
+            }
+        }
     </script>
 </body>
 </html>
