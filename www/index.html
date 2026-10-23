@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Biz Connect - Multi-Vendor Marketplace</title>
+    
+    <!-- Adsterra Banner Script -->
+    <script async="async" data-cfasync="false" src="https://bauval.org/21/7ca312c246bf9dcad2abf89b91fe6448"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -60,6 +64,11 @@
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
+        button, a, .store-link-btn, input, textarea, select, .file-upload-box {
+            pointer-events: auto !important;
+            cursor: pointer;
+        }
+
         /* Modern Header */
         header {
             background: var(--card-bg);
@@ -110,7 +119,6 @@
         }
 
         button {
-            cursor: pointer;
             border: none;
             padding: 0.55rem 1rem;
             border-radius: var(--radius-md);
@@ -157,8 +165,6 @@
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            cursor: pointer;
-            transition: var(--transition);
             position: relative;
         }
 
@@ -308,7 +314,7 @@
             padding: 0;
             font-size: 0.85rem;
             font-weight: 600;
-            cursor: pointer;
+            border: none;
         }
 
         .store-link-btn:hover {
@@ -407,7 +413,6 @@
             padding: 1.5rem;
             text-align: center;
             border-radius: var(--radius-md);
-            cursor: pointer;
             background: var(--bg-color);
             transition: var(--transition);
         }
@@ -524,7 +529,6 @@
             display: flex;
             gap: 0.5rem;
             font-size: 1.75rem;
-            cursor: pointer;
             color: var(--border);
             margin: 0.5rem 0;
         }
@@ -592,6 +596,7 @@
             align-items: center;
             z-index: 200;
             padding: 1rem;
+            pointer-events: auto !important;
         }
 
         .modal-card {
@@ -641,7 +646,6 @@
             color: var(--primary);
             text-decoration: none;
             font-weight: 600;
-            cursor: pointer;
         }
         .support-link:hover { text-decoration: underline; }
     </style>
@@ -688,7 +692,7 @@
                 <p>Discover unique products directly from independent business owners</p>
             </div>
             <div id="products-grid" class="products-grid">
-                <!-- Dynamic Products Injected Here -->
+                <!-- Dynamic Products & Adsterra Banner Injected Here -->
             </div>
         </section>
 
@@ -1036,7 +1040,6 @@
             `).join('');
         }
 
-        // Handle Image Upload File-to-Base64 Conversion
         function handleImagePreview(event) {
             const file = event.target.files[0];
             if (file) {
@@ -1049,7 +1052,6 @@
             }
         }
 
-        // Save or Edit Profile
         function saveProfile(event) {
             event.preventDefault();
             currentVendor = {
@@ -1080,7 +1082,6 @@
             }
         });
 
-        // Save Product
         function saveProduct(event) {
             event.preventDefault();
             if (!currentVendor) {
@@ -1117,15 +1118,46 @@
             switchView('feed');
         }
 
-        // Render Main Feed
+        // Render Feed with Adsterra Live Script Banner Container + Native Banner Card
         function renderFeed() {
             const grid = document.getElementById('products-grid');
+            
+            // 1. Live Adsterra Banner Script Container
+            let scriptBannerHTML = `
+                <div class="product-card" style="border: 1px solid var(--border); padding: 1rem; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 250px;">
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 700; width: 100%; border-bottom: 1px solid var(--border); padding-bottom: 0.3rem;">Sponsored Partner</div>
+                    <div id="container-7ca312c246bf9dcad2abf89b91fe6448"></div>
+                </div>
+            `;
+
+            // 2. High-Converting Direct Link Native Banner Card
+            let directLinkBannerHTML = `
+                <div class="product-card" style="border: 2px solid var(--primary); background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(168, 85, 247, 0.05));">
+                    <div class="product-img-container" style="background: var(--primary-gradient); display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; padding: 1.5rem; text-align: center;">
+                        <i class="fa-solid fa-rectangle-ad" style="font-size: 3rem; margin-bottom: 0.5rem;"></i>
+                        <span style="font-weight: 800; font-size: 1.1rem;">EXCLUSIVE DEALS</span>
+                    </div>
+                    <div class="product-info">
+                        <div class="product-title">🔥 Featured Platform Offers</div>
+                        <div class="product-price" style="font-size: 1.1rem;">Claim Special Rewards</div>
+                        <div class="product-desc">Check out verified partner promotions available exclusively for users in your area.</div>
+                        <div class="product-actions" style="margin-top: auto;">
+                            <button class="btn-primary" style="width: 100%; justify-content: center; padding: 0.75rem;" onclick="window.open('https://www.highrevenuenetwork.com/6125811', '_blank')">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i> Explore Deals
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            let combinedAds = scriptBannerHTML + directLinkBannerHTML;
+
             if (allProducts.length === 0) {
-                grid.innerHTML = `<div class="empty-state" style="grid-column: 1/-1;"><h3>No products available yet</h3><p>Be the first vendor to setup your profile and list items!</p></div>`;
+                grid.innerHTML = combinedAds + `<div class="empty-state" style="grid-column: span 1;"><h3>No user products yet</h3><p>Be the first vendor to setup your profile and list items!</p></div>`;
                 return;
             }
 
-            grid.innerHTML = allProducts.map(p => `
+            let productsHTML = allProducts.map(p => `
                 <div class="product-card">
                     <div class="product-img-container">
                         <img src="${p.image}" alt="${p.name}" class="product-img" onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&auto=format&fit=crop&q=60'">
@@ -1142,16 +1174,17 @@
                             <button class="btn-primary btn-order-direct" onclick='openOrderModal(${JSON.stringify(p.id)})'>
                                 <i class="fa-solid fa-cart-shopping"></i> Order Here
                             </button>
-                            <a href="https://wa.me/${p.vendorPhone.replace(/\D/g,'')}?text=Hi%20${encodeURIComponent(p.vendorName)},%20I%20am%20interested%20in%20your%20product:%20${encodeURIComponent(p.name)}" target="_blank" class="btn-whatsapp-sm" title="Chat or Call manually">
+                            <a href="https://wa.me/${p.vendorPhone.replace(/\D/g,'')}?text=Hi%20${encodeURIComponent(p.vendorName)},%20I%20am%20interested%20in%20your%20product:%20${encodeURIComponent(p.name)}" target="_blank" class="btn-whatsapp-sm">
                                 <i class="fa-brands fa-whatsapp"></i> Chat
                             </a>
                         </div>
                     </div>
                 </div>
             `).join('');
+
+            grid.innerHTML = combinedAds + productsHTML;
         }
 
-        // Direct Order Flow
         function openOrderModal(productId) {
             selectedProductForOrder = allProducts.find(p => p.id === productId);
             if (!selectedProductForOrder) return;
@@ -1190,7 +1223,6 @@
             checkVendorNotifications();
         }
 
-        // Check & Display Vendor Notifications
         function checkVendorNotifications() {
             if (!currentVendor) return;
             const vendorOrders = allOrders.filter(o => o.vendorName === currentVendor.name);
@@ -1272,7 +1304,6 @@
             document.getElementById('vendorOrdersModal').style.display = 'none';
         }
 
-        // View Specific Storefront
         function viewMyStore() {
             if (currentVendor) viewStoreFront(currentVendor.name);
         }
